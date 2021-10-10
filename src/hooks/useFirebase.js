@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import initializeAuthentication from '../Firebase/firebase.init';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
 
 initializeAuthentication();
 const useFirebase = () => {
@@ -18,10 +18,29 @@ const useFirebase = () => {
                 setError(error.message);
             })
     }
+
+    const logOut = () => {
+        signOut(auth)
+            .then(() => {
+                setUser({});
+            })
+    }
+
+    useEffect(() => {
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                console.log("Inside State Changed: ", user);
+                setUser(user);
+            }
+        })
+    }, [])
+
+
     return {
         user,
         error,
-        signInUsingGoogle
+        signInUsingGoogle,
+        logOut
     }
 }
 
